@@ -1,4 +1,5 @@
 namespace Models;
+using Microsoft.AspNetCore;
 using Other.Passwords;
 
 public class User

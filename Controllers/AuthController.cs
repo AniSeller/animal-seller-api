@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 public class InitialController : ControllerBase
 {
     [HttpPost("register")]
-    public ActionResult Register(UserRegisterApiModel user)
+    public ActionResult Register([FromBody] UserRegisterApiModel user)
     {
         var userDb = new UserDbContext();
         
