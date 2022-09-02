@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "Z8KMfWKOXsgExfdm93de6cQqtHyglc4zL4oWydX8NPI=",
+  "Source": "animal-seller-api",
+  "BasePath": "_content/animal-seller-api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
