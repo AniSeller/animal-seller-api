@@ -1,6 +1,6 @@
 public record UserRegisterApiModel
 {
-    public string Name;
-    public string Login;
-    public string Password;
+    public string Name { get; set; }
+    public string Login { get; set; }
+    public string Password { get; set; }
 }
