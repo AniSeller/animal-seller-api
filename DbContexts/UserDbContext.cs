@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 public class UserDbContext : DbContext
 {
     public DbSet<User> Users { get; set; }
-    public DbSet<TokenMapping> UserTokens { get; set; }
+    public DbSet<UserIdTokenPair> UserTokens { get; set; }
     private string DbPath { get; set; }
     
     public UserDbContext()

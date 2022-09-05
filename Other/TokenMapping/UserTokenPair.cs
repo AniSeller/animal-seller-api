@@ -4,12 +4,13 @@ namespace animal_seller_api.Other.TokenMapping;
 
 public class UserTokenPair
 {
-    public User User { get; set; }
+    public int Id { get; set; }
     public string Token { get; set; }
+    public User User { get; set; }
 
-    public UserTokenPair(User usr, string token)
+    public UserTokenPair(User userId, string token)
     {
-        User = usr;
         Token = token;
+        User = userId;
     }
 }

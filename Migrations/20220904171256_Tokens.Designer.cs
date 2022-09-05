@@ -18,7 +18,7 @@ namespace animal_seller_api.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
 
-            modelBuilder.Entity("animal_seller_api.Other.TokenMapping.TokenMapping", b =>
+            modelBuilder.Entity("animal_seller_api.Other.UserIdTokenPair.UserIdTokenPair", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

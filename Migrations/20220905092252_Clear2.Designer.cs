@@ -10,15 +10,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace animal_seller_api.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20220904173443_Secc")]
-    partial class Secc
+    [Migration("20220905092252_Clear2")]
+    partial class Clear2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
 
-            modelBuilder.Entity("animal_seller_api.Other.UserIdTokenPair.UserIdTokenPair", b =>
+            modelBuilder.Entity("animal_seller_api.Other.TokenMapping.UserIdTokenPair", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()

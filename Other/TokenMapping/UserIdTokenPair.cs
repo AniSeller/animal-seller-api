@@ -1,12 +1,12 @@
 namespace animal_seller_api.Other.TokenMapping;
 
-public class TokenMapping
+public class UserIdTokenPair
 {
     public int Id { get; set; }
     public string Token { get; set; }
     public string UserId { get; set; }
 
-    public TokenMapping(string token, string userId)
+    public UserIdTokenPair(string userId, string token)
     {
         Token = token;
         UserId = userId;

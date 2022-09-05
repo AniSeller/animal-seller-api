@@ -43,13 +43,16 @@ public class InitialController : ControllerBase
             .FirstOrDefault(u => u.Login == user.Login && u.Password == user.Password);
         
         if (foundUser is null)
-            return Problem("Not registered");
+            return Problem("Invalid login / password");
 
         var tokenAttached = GenerateTokenMapping(foundUser);
-        var oldTokenMapping = context.UserTokens.FirstOrDefault(oldTMap => oldTMap.UserId == tokenAttached.UserId);
+        var oldTokenMapping = context.UserTokens.FirstOrDefault(oldTMap => oldTMap.UserId == foundUser.Id);
 
         if (!(oldTokenMapping is null))
-            context.Remove(oldTokenMapping);
+        {
+            context.UserTokens.Remove(oldTokenMapping);
+            Console.WriteLine($"Found old mapping: {oldTokenMapping.UserId}, {oldTokenMapping.Token}");
+        }
         
         context.UserTokens.Add(tokenAttached);
         context.SaveChanges();
@@ -58,19 +61,25 @@ public class InitialController : ControllerBase
         return Ok(new UserTokenPair(foundUser, tokenAttached.Token));
     }
 
-    [HttpGet("bigGreet")]
-    public ActionResult<List<User>> BigGreetingResult()
+    [HttpGet("users")]
+    public ActionResult<List<User>> Users()
     {
         return context.Users.ToList();
     }
 
-    private TokenMapping GenerateTokenMapping(User user)
+    [HttpGet("tokens")]
+    public ActionResult<List<UserIdTokenPair>> UserTokens()
+    {
+        return context.UserTokens.ToList();
+    }
+
+    private UserIdTokenPair GenerateTokenMapping(User user)
     {
         var token = new StringBuilder();
         for (int i = 0; i < 16; i++) 
             token.Append((char)new Random().Next(97, 123));
 
-        return new TokenMapping(token.ToString(), user.Id);
+        return new UserIdTokenPair(user.Id, token.ToString());
     }
     
 }

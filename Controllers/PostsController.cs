@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using animal_seller_api.ApiModels.Post;
 
 namespace Controllers;
@@ -19,11 +20,11 @@ public class PostsController : ControllerBase
     public ActionResult CreatePost([FromBody] PostApiModel post)
     {
         var tokenMapping = context.UserTokens.FirstOrDefault(tokenUser => tokenUser.Token == post.UserToken);
-        if (tokenMapping is null)
+        if (tokenMapping == null)
             return Problem("Invalid token!");
 
         var user = context.Users.FirstOrDefault(u => u.Id == tokenMapping.UserId);
-        if (user is null)
+        if (user == null)
             return Problem("Invalid user!");
 
         user.Posts.Add(Unpack(post));
