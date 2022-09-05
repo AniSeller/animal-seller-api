@@ -6,13 +6,14 @@ using Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-public class UserDbContext : DbContext
+public class DatabaseContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<Post> Posts { get; set; }
     public DbSet<UserIdTokenPair> UserTokens { get; set; }
     private string DbPath { get; set; }
     
-    public UserDbContext()
+    public DatabaseContext()
     {
         var folder = Environment.SpecialFolder.LocalApplicationData;
         DbPath = Path.Join(Environment.GetFolderPath(folder), "userDatabase.db");

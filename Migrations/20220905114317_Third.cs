@@ -4,7 +4,7 @@
 
 namespace animal_seller_api.Migrations
 {
-    public partial class Sec : Migration
+    public partial class Third : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

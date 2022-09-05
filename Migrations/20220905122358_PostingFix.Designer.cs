@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace animal_seller_api.Migrations
 {
-    [DbContext(typeof(UserDbContext))]
-    [Migration("20220905091202_Clear")]
-    partial class Clear
+    [DbContext(typeof(DatabaseContext))]
+    [Migration("20220905122358_PostingFix")]
+    partial class PostingFix
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -55,13 +55,12 @@ namespace animal_seller_api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Post");
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Models.User", b =>
@@ -81,21 +80,13 @@ namespace animal_seller_api.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("PostIds")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Models.Post", b =>
-                {
-                    b.HasOne("Models.User", null)
-                        .WithMany("Posts")
-                        .HasForeignKey("UserId");
-                });
-
-            modelBuilder.Entity("Models.User", b =>
-                {
-                    b.Navigation("Posts");
                 });
 #pragma warning restore 612, 618
         }

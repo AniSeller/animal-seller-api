@@ -9,14 +9,34 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace animal_seller_api.Migrations
 {
-    [DbContext(typeof(UserDbContext))]
-    [Migration("20220905092252_Clear2")]
-    partial class Clear2
+    [DbContext(typeof(DatabaseContext))]
+    [Migration("20220905114317_Third")]
+    partial class Third
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.8");
+
+            modelBuilder.Entity("animal_seller_api.Other.PostSerializing.IdentifiableString", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("IdentifiableString");
+                });
 
             modelBuilder.Entity("animal_seller_api.Other.TokenMapping.UserIdTokenPair", b =>
                 {
@@ -55,13 +75,12 @@ namespace animal_seller_api.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UserId")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Post");
+                    b.ToTable("Posts");
                 });
 
             modelBuilder.Entity("Models.User", b =>
@@ -86,16 +105,16 @@ namespace animal_seller_api.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Models.Post", b =>
+            modelBuilder.Entity("animal_seller_api.Other.PostSerializing.IdentifiableString", b =>
                 {
                     b.HasOne("Models.User", null)
-                        .WithMany("Posts")
+                        .WithMany("PostIds")
                         .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("Models.User", b =>
                 {
-                    b.Navigation("Posts");
+                    b.Navigation("PostIds");
                 });
 #pragma warning restore 612, 618
         }

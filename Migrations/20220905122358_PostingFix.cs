@@ -4,7 +4,7 @@
 
 namespace animal_seller_api.Migrations
 {
-    public partial class Clear : Migration
+    public partial class PostingFix : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

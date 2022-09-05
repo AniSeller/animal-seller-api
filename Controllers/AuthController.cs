@@ -11,66 +11,62 @@ using Microsoft.AspNetCore.Mvc;
 public class InitialController : ControllerBase
 {
 
-    private UserDbContext context;
+    private DatabaseContext _databaseContext;
 
-    public InitialController(UserDbContext dbContext)
+    public InitialController(DatabaseContext dbDatabaseContext)
     {
-        context = dbContext;
+        _databaseContext = dbDatabaseContext;
     }
 
     [HttpPost("register")]
     public ActionResult Register([FromBody] UserRegisterApiModel user)
     {
         
-        if (context.Users.OrderBy(e => e.Id).LastOrDefault(u => u.Name == user.Name && u.Password == user.Password) != null)
+        if (_databaseContext.Users.OrderBy(e => e.Id).LastOrDefault(u => u.Name == user.Name && u.Password == user.Password) != null)
             return Problem("User already exists!");
         
         if (!PasswordChecker.Check(user.Password)) 
             return Problem("Incorrect password!");
 
         var newUser = new User(user.Name, user.Login, user.Password, new Random().NextInt64().ToString());
-        context.Users.Add(newUser);
-        context.UserTokens.Add(GenerateTokenMapping(newUser));
-        context.SaveChanges();
+        _databaseContext.Users.Add(newUser);
 
-        return Ok();
+        var tokenPair = GenerateTokenMapping(newUser);
+        _databaseContext.UserTokens.Add(tokenPair);
+        _databaseContext.SaveChanges();
+
+        return Ok(tokenPair.Token);
     }
 
     [HttpPost("login")]
     public ActionResult Login([FromBody] UserLoginApiModel user)
     {
-        var foundUser = context.Users.OrderBy(e => e.Id)
+        var foundUser = _databaseContext.Users.OrderBy(e => e.Id)
             .FirstOrDefault(u => u.Login == user.Login && u.Password == user.Password);
         
         if (foundUser is null)
             return Problem("Invalid login / password");
 
-        var tokenAttached = GenerateTokenMapping(foundUser);
-        var oldTokenMapping = context.UserTokens.FirstOrDefault(oldTMap => oldTMap.UserId == foundUser.Id);
-
-        if (!(oldTokenMapping is null))
-        {
-            context.UserTokens.Remove(oldTokenMapping);
-            Console.WriteLine($"Found old mapping: {oldTokenMapping.UserId}, {oldTokenMapping.Token}");
-        }
+        var tokenMapping = _databaseContext.UserTokens.FirstOrDefault(oldTMap => oldTMap.UserId == foundUser.Id);
+        if (tokenMapping is null)
+            return Problem("Not registered");
         
-        context.UserTokens.Add(tokenAttached);
-        context.SaveChanges();
-        
+        tokenMapping.Token = GenerateTokenMapping(foundUser).Token;
+        _databaseContext.SaveChanges();
 
-        return Ok(new UserTokenPair(foundUser, tokenAttached.Token));
+        return Ok(new UserTokenPair(foundUser, tokenMapping.Token));
     }
 
     [HttpGet("users")]
     public ActionResult<List<User>> Users()
     {
-        return context.Users.ToList();
+        return _databaseContext.Users.ToList();
     }
 
     [HttpGet("tokens")]
     public ActionResult<List<UserIdTokenPair>> UserTokens()
     {
-        return context.UserTokens.ToList();
+        return _databaseContext.UserTokens.ToList();
     }
 
     private UserIdTokenPair GenerateTokenMapping(User user)

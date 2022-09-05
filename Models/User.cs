@@ -1,3 +1,6 @@
+using System.ComponentModel.DataAnnotations;
+using animal_seller_api.Other.PostSerializing;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic.CompilerServices;
 
 namespace Models;
@@ -10,8 +13,7 @@ public class User
     public string Login { get; set; }
     public string Password { get; set; }
     public string Id { get; set; }
-
-    public List<Post> Posts { get; set; } = new List<Post>();
+    public string PostIds { get; set; } = "[]";
 
     public User(string name, string login, string password, string id)
     {
