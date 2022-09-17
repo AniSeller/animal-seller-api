@@ -1,7 +1,11 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
+
 namespace Controllers;
 
 using System.Text;
-using animal_seller_api.Other.TokenMapping;
 using Models;
 using DbContexts;
 using Other.Passwords;
@@ -12,16 +16,17 @@ public class InitialController : ControllerBase
 {
 
     private DatabaseContext _databaseContext;
+    private IConfiguration _configuration;
 
-    public InitialController(DatabaseContext dbDatabaseContext)
+    public InitialController(DatabaseContext dbContext, IConfiguration configuration)
     {
-        _databaseContext = dbDatabaseContext;
+        _databaseContext = dbContext;
+        _configuration = configuration;
     }
 
     [HttpPost("register")]
     public ActionResult Register([FromBody] UserRegisterApiModel user)
     {
-        
         if (_databaseContext.Users.OrderBy(e => e.Id).LastOrDefault(u => u.Name == user.Name && u.Password == user.Password) != null)
             return Problem("User already exists!");
         
@@ -30,12 +35,11 @@ public class InitialController : ControllerBase
 
         var newUser = new User(user.Name, user.Login, user.Password, new Random().NextInt64().ToString());
         _databaseContext.Users.Add(newUser);
-
-        var tokenPair = GenerateTokenMapping(newUser);
-        _databaseContext.UserTokens.Add(tokenPair);
         _databaseContext.SaveChanges();
 
-        return Ok(tokenPair.Token);
+        var (tokenHandler, token) = GenerateToken(newUser);
+        
+        return Ok(tokenHandler.WriteToken(token));
     }
 
     [HttpPost("login")]
@@ -45,16 +49,13 @@ public class InitialController : ControllerBase
             .FirstOrDefault(u => u.Login == user.Login && u.Password == user.Password);
         
         if (foundUser is null)
-            return Problem("Invalid login / password");
-
-        var tokenMapping = _databaseContext.UserTokens.FirstOrDefault(oldTMap => oldTMap.UserId == foundUser.Id);
-        if (tokenMapping is null)
             return Problem("Not registered");
-        
-        tokenMapping.Token = GenerateTokenMapping(foundUser).Token;
+
         _databaseContext.SaveChanges();
 
-        return Ok(new UserTokenPair(foundUser, tokenMapping.Token));
+        var (tokenHandler, token) = GenerateToken(foundUser);
+        
+        return Ok(tokenHandler.WriteToken(token));
     }
 
     [HttpGet("users")]
@@ -62,20 +63,26 @@ public class InitialController : ControllerBase
     {
         return _databaseContext.Users.ToList();
     }
-
-    [HttpGet("tokens")]
-    public ActionResult<List<UserIdTokenPair>> UserTokens()
+    
+    private Tuple<JwtSecurityTokenHandler, SecurityToken> GenerateToken(User user)
     {
-        return _databaseContext.UserTokens.ToList();
-    }
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
 
-    private UserIdTokenPair GenerateTokenMapping(User user)
-    {
-        var token = new StringBuilder();
-        for (int i = 0; i < 16; i++) 
-            token.Append((char)new Random().Next(97, 123));
-
-        return new UserIdTokenPair(user.Id, token.ToString());
+        var descriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(new[]
+            {
+                new Claim("UserId", user.Id)
+            }),
+            Audience = _configuration["Jwt:Audience"],
+            Issuer = _configuration["Jwt:Issuer"],
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha512Signature)
+        };
+        
+        var token = tokenHandler.CreateToken(descriptor);
+        
+        return new Tuple<JwtSecurityTokenHandler, SecurityToken>(tokenHandler, token);
     }
     
 }

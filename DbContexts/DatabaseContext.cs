@@ -1,5 +1,3 @@
-using animal_seller_api.Other.TokenMapping;
-
 namespace DbContexts;
 
 using Models;
@@ -10,7 +8,6 @@ public class DatabaseContext : DbContext
 {
     public DbSet<User> Users { get; set; }
     public DbSet<Post> Posts { get; set; }
-    public DbSet<UserIdTokenPair> UserTokens { get; set; }
     private string DbPath { get; set; }
     
     public DatabaseContext()

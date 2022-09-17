@@ -1,14 +1,10 @@
-using System.Diagnostics;
 using animal_seller_api.ApiModels.Post;
-using animal_seller_api.Other.PostSerializing;
-
-namespace Controllers;
-using System.Text;
-using animal_seller_api.Other.TokenMapping;
+using Microsoft.AspNetCore.Authorization;
 using Models;
 using DbContexts;
-using Other.Passwords;
 using Microsoft.AspNetCore.Mvc;
+
+namespace Controllers;
 
 [Route("/")]
 public class PostsController : ControllerBase
@@ -18,15 +14,18 @@ public class PostsController : ControllerBase
     public PostsController(DatabaseContext c) => context = c;
     
     [HttpPost("createPost")]
+    [Authorize]
     public ActionResult CreatePost([FromBody] PostApiModel post)
     {
-        var tokenMapping = context.UserTokens.FirstOrDefault(tokenUser => tokenUser.Token == post.UserToken);
-        if (tokenMapping == null)
-            return Problem("Invalid access token!");
-
-        var user = context.Users.FirstOrDefault(u => u.Id == tokenMapping.UserId);
+        // var tokenMapping = context.UserTokens.FirstOrDefault(tokenUser => tokenUser.Token == post.UserToken);
+        // if (tokenMapping == null)
+        //     return Problem("Invalid access token!");
+        
+        var jwtId = User.FindFirst("UserId").Value;
+        
+        var user = context.Users.FirstOrDefault(u => u.Id == jwtId);
         if (user == null)
-            return Problem("Invalid access token!");
+            return Problem("Invalid token!");
 
         var postModel = Unpack(post, user);
 
